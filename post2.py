@@ -2,10 +2,9 @@ import streamlit as st
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
-from urllib.parse import urlparse
 
 def get_search_results(keyword):
-    url = f"https://www.google.co.in/search?q={'+'.join(keyword.split())}&num=60"
+    url = f"https://www.google.co.in/search?q={'+'.join(keyword.split())}&num=60&gl=in&hl=en"
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107 Safari/537",
     }
@@ -28,13 +27,12 @@ def find_domain_ranking(html_content, domain):
     return None, urls_ranking
 
 def clean_domain(domain):
-    parsed_domain = urlparse(domain)
-    if parsed_domain.scheme and parsed_domain.netloc:
-        return parsed_domain.netloc
-    elif parsed_domain.netloc:
-        return parsed_domain.netloc
-    else:
-        return domain
+    domain = domain.lower()
+    if domain.startswith('http://') or domain.startswith('https://'):
+        domain = domain.split("//")[-1]
+    if domain.startswith('www.'):
+        domain = domain.split("www.")[-1]
+    return domain
 
 def main():
     st.title("Google Domain Ranking Checker")
