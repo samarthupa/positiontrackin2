@@ -20,6 +20,8 @@ def find_domain_ranking(html_content, domain):
     soup = BeautifulSoup(html_content, 'html.parser')
     results = soup.find_all('div', class_='tF2Cxc')
     for i, result in enumerate(results, start=1):
+        if i > 60:
+            return None
         if domain.lower() in result.get_text().lower():
             return i
     return None
