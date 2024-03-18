@@ -1,6 +1,8 @@
 import streamlit as st
 import requests
 from bs4 import BeautifulSoup
+import pandas as pd
+from urllib.parse import urlparse
 
 def get_search_results(keyword):
     url = f"https://www.google.co.in/search?q={'+'.join(keyword.split())}"
@@ -18,38 +20,50 @@ def find_domain_ranking(html_content, domain):
     soup = BeautifulSoup(html_content, 'html.parser')
     results = soup.find_all('div', class_='tF2Cxc')
     for i, result in enumerate(results, start=1):
-        if domain in result.get_text():
+        if domain.lower() in result.get_text().lower():
             return i
     return None
+
+def clean_domain(domain):
+    parsed_domain = urlparse(domain)
+    if parsed_domain.scheme and parsed_domain.netloc:
+        return parsed_domain.netloc
+    elif parsed_domain.netloc:
+        return parsed_domain.netloc
+    else:
+        return domain
 
 def main():
     st.title("Google Domain Ranking Checker")
     st.write("Enter the keywords and the domain you want to check.")
 
-    keywords = st.text_input("Enter Keywords (separated by commas):")
+    keywords = st.text_area("Enter Keywords (one per line):")
     domain = st.text_input("Enter Domain (e.g., example.com):")
 
     if st.button("Check Ranking"):
-        if not keywords:
+        if not keywords.strip():
             st.error("Please enter at least one keyword.")
             return
-        if not domain:
+        if not domain.strip():
             st.error("Please enter a domain to check.")
             return
 
-        keywords_list = [keyword.strip() for keyword in keywords.split(",")]
+        keywords_list = [keyword.strip() for keyword in keywords.split("\n") if keyword.strip()]
 
+        data = []
         for keyword in keywords_list:
-            st.subheader(f"Keyword: {keyword}")
             search_results = get_search_results(keyword)
             if search_results:
-                ranking = find_domain_ranking(search_results, domain)
+                ranking = find_domain_ranking(search_results, clean_domain(domain))
                 if ranking:
-                    st.success(f"The domain {domain} is ranked {ranking} for the keyword '{keyword}'.")
+                    data.append([keyword, ranking])
                 else:
-                    st.warning(f"The domain {domain} is not found in the search results for the keyword '{keyword}'.")
+                    data.append([keyword, "Not Found"])
             else:
-                st.error(f"Failed to retrieve search results for the keyword '{keyword}'.")
+                data.append([keyword, "Failed"])
+
+        df = pd.DataFrame(data, columns=["Keyword", "Ranking"])
+        st.table(df)
 
 if __name__ == "__main__":
     main()
