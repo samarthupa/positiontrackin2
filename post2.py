@@ -2,7 +2,7 @@ import streamlit as st
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
-import base64  # Add this import for base64 encoding
+import base64
 
 def get_search_results(keyword):
     url = f"https://www.google.co.in/search?q={'+'.join(keyword.split())}&num=60&gl=in&hl=en"
@@ -53,32 +53,29 @@ def main():
         keywords_list = [keyword.strip() for keyword in keywords.split("\n") if keyword.strip()]
 
         data = []
-        urls_ranking_data = []
         for keyword in keywords_list:
             search_results = get_search_results(keyword)
             if search_results:
                 ranking, urls_ranking = find_domain_ranking(search_results, clean_domain(domain))
-                urls_ranking_data.append(urls_ranking)
                 if ranking:
-                    data.append([keyword, ranking])
+                    urls_ranking_str = "\n".join(urls_ranking)
+                    data.append([keyword, ranking, urls_ranking_str])
                 else:
-                    data.append([keyword, "Not Found"])
+                    urls_ranking_str = "\n".join(urls_ranking)
+                    data.append([keyword, "Not Found", urls_ranking_str])
             else:
-                data.append([keyword, "Failed"])
+                data.append([keyword, "Failed", ""])
 
-        df = pd.DataFrame(data, columns=["Keyword", "Ranking"])
+        df = pd.DataFrame(data, columns=["Keyword", "Ranking", "URLs Ranking"])
 
-        # Display the table without the "URLs Ranking" column
+        # Download CSV
+        csv = df.to_csv(index=False)
+        b64 = base64.b64encode(csv.encode()).decode()
+        href = f'<a href="data:file/csv;base64,{b64}" download="domain_ranking_results.csv">Download CSV</a>'
+        st.markdown(href, unsafe_allow_html=True)
+
+        # Display DataFrame
         st.table(df)
-
-        # Add a download button to download the data as a CSV file
-        if st.button("Download CSV"):
-            df_with_urls = df.copy()
-            df_with_urls["URLs Ranking"] = urls_ranking_data
-            csv = df_with_urls.to_csv(index=False)
-            b64 = base64.b64encode(csv.encode()).decode()
-            href = f'<a href="data:file/csv;base64,{b64}" download="domain_rankings.csv">Download CSV File</a>'
-            st.markdown(href, unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
