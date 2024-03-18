@@ -18,15 +18,13 @@ def get_search_results(keyword):
 
 def find_domain_ranking(html_content, domain):
     soup = BeautifulSoup(html_content, 'html.parser')
-    results = soup.find_all('div', class_='g')
+    organic_results = soup.find_all('div', class_='yuRUbf')
     urls_ranking = []
-    for i, result in enumerate(results, start=1):
+    for i, result in enumerate(organic_results, start=1):
         url = result.find('a')['href']
-        # Check if the URL is an organic search result
-        if 'url?q=' in url and not 'webcache' in url:
-            urls_ranking.append(url)
-            if domain.lower() in result.get_text().lower():
-                return i, urls_ranking
+        urls_ranking.append(url)
+        if domain.lower() in result.get_text().lower():
+            return i, urls_ranking
     return None, urls_ranking
 
 def clean_domain(domain):
