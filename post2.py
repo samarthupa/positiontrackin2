@@ -5,7 +5,7 @@ import pandas as pd
 import base64
 
 def get_search_results(keyword):
-    url = f"https://www.google.co.in/search?q={'+'.join(keyword.split())}&num=60&gl=in&hl=en"
+    url = f"https://www.google.com/search?q={'+'.join(keyword.split())}&num=60&gl=in&hl=en"
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107 Safari/537",
     }
