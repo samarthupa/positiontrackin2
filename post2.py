@@ -59,11 +59,13 @@ def main():
             if search_results:
                 ranking, urls_ranking = find_domain_ranking(search_results, clean_domain(domain))
                 if ranking:
-                    data.append([keyword, ranking, urls_ranking])
+                    urls_ranking_str = "\n".join(urls_ranking)
+                    data.append([keyword, ranking, urls_ranking_str])
                 else:
-                    data.append([keyword, "Not Found", urls_ranking])
+                    urls_ranking_str = "\n".join(urls_ranking)
+                    data.append([keyword, "Not Found", urls_ranking_str])
             else:
-                data.append([keyword, "Failed", urls_ranking])
+                data.append([keyword, "Failed", ""])
 
         df = pd.DataFrame(data, columns=["Keyword", "Ranking", "URLs Ranking"])
         st.table(df)
