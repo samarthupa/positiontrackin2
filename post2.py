@@ -57,16 +57,25 @@ def main():
             if search_results:
                 ranking, urls_ranking = find_domain_ranking(search_results, clean_domain(domain))
                 if ranking:
-                    urls_ranking_str = "\n".join(urls_ranking)
-                    data.append([keyword, ranking, urls_ranking_str])
+                    data.append([keyword, ranking])
                 else:
-                    urls_ranking_str = "\n".join(urls_ranking)
-                    data.append([keyword, "Not Found", urls_ranking_str])
+                    data.append([keyword, "Not Found"])
             else:
-                data.append([keyword, "Failed", ""])
+                data.append([keyword, "Failed"])
 
-        df = pd.DataFrame(data, columns=["Keyword", "Ranking", "URLs Ranking"])
-        st.table(df)
+        df = pd.DataFrame(data, columns=["Keyword", "Ranking"])
+
+        # Download button
+        csv = df.to_csv(index=False)
+        st.download_button(
+            label="Download CSV",
+            data=csv,
+            file_name="google_domain_rankings.csv",
+            mime="text/csv"
+        )
+
+        # Display table without the "URLs Ranking" column
+        st.table(df.drop(columns=["URLs Ranking"]))
 
 if __name__ == "__main__":
     main()
