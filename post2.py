@@ -5,7 +5,7 @@ import pandas as pd
 from urllib.parse import urlparse
 
 def get_search_results(keyword):
-    url = f"https://www.google.co.in/search?q={'+'.join(keyword.split())}"
+    url = f"https://www.google.co.in/search?q={'+'.join(keyword.split())}&num=60"
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107 Safari/537",
     }
@@ -20,8 +20,6 @@ def find_domain_ranking(html_content, domain):
     soup = BeautifulSoup(html_content, 'html.parser')
     results = soup.find_all('div', class_='tF2Cxc')
     for i, result in enumerate(results, start=1):
-        if i > 60:
-            return None
         if domain.lower() in result.get_text().lower():
             return i
     return None
