@@ -5,7 +5,7 @@ import pandas as pd
 import base64
 
 def get_search_results(keyword):
-    url = f"https://www.google.com/search?q={'+'.join(keyword.split())}&num=60&gl=in&hl=en"
+    url = f"https://www.google.co.in/search?q={'+'.join(keyword.split())}&num=60&gl=in&hl=en"
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107 Safari/537",
     }
@@ -13,7 +13,7 @@ def get_search_results(keyword):
     if response.status_code == 200:
         return response.text
     else:
-        st.error("Failed to retrieve search results.")
+        st.error(f"Failed to retrieve search results. Status code: {response.status_code}")
         return None
 
 def find_domain_ranking(html_content, domain):
