@@ -18,9 +18,9 @@ def get_search_results(keyword):
 
 def find_domain_ranking(html_content, domain):
     soup = BeautifulSoup(html_content, 'html.parser')
-    organic_results = soup.find_all('div', class_='yuRUbf')
+    results = soup.find_all('div', class_='yuRUbf')
     urls_ranking = []
-    for i, result in enumerate(organic_results, start=1):
+    for i, result in enumerate(results, start=1):
         url = result.find('a')['href']
         urls_ranking.append(url)
         if domain.lower() in result.get_text().lower():
