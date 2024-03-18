@@ -52,10 +52,12 @@ def main():
         keywords_list = [keyword.strip() for keyword in keywords.split("\n") if keyword.strip()]
 
         data = []
+        urls_ranking_data = []
         for keyword in keywords_list:
             search_results = get_search_results(keyword)
             if search_results:
                 ranking, urls_ranking = find_domain_ranking(search_results, clean_domain(domain))
+                urls_ranking_data.append(urls_ranking)
                 if ranking:
                     data.append([keyword, ranking])
                 else:
@@ -65,17 +67,17 @@ def main():
 
         df = pd.DataFrame(data, columns=["Keyword", "Ranking"])
 
-        # Download button
-        csv = df.to_csv(index=False)
-        st.download_button(
-            label="Download CSV",
-            data=csv,
-            file_name="google_domain_rankings.csv",
-            mime="text/csv"
-        )
+        # Display the table without the "URLs Ranking" column
+        st.table(df)
 
-        # Display table without the "URLs Ranking" column
-        st.table(df.drop(columns=["URLs Ranking"]))
+        # Add a download button to download the data as a CSV file
+        if st.button("Download CSV"):
+            df_with_urls = df.copy()
+            df_with_urls["URLs Ranking"] = urls_ranking_data
+            csv = df_with_urls.to_csv(index=False)
+            b64 = base64.b64encode(csv.encode()).decode()
+            href = f'<a href="data:file/csv;base64,{b64}" download="domain_rankings.csv">Download CSV File</a>'
+            st.markdown(href, unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
