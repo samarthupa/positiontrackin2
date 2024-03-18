@@ -3,6 +3,7 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import base64
+import time
 
 def get_search_results(keyword):
     url = f"https://www.google.co.in/search?q={'+'.join(keyword.split())}&num=60&gl=in&hl=en"
@@ -54,6 +55,10 @@ def main():
 
         data = []
         for keyword in keywords_list:
+            with st.empty():
+                st.info("Processing the keyword...")
+                time.sleep(60)  # Wait for one minute before sending the request
+
             search_results = get_search_results(keyword)
             if search_results:
                 ranking, urls_ranking = find_domain_ranking(search_results, clean_domain(domain))
